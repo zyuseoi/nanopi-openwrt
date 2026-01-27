@@ -10,6 +10,8 @@ CONFIG_TARGET_ROOTFS_EXT4FS=y
 CONFIG_TARGET_BUILD_SUNXI_SDIMAGE=y
 
 # Basic Network & Kernel Modules (IPv4 only)
+CONFIG_PACKAGE_kmod-brcmfmac=y
+CONFIG_PACKAGE_brcmfmac-firmware-43455-sdio=y
 CONFIG_PACKAGE_ip-full=y
 CONFIG_PACKAGE_ipset=y
 CONFIG_PACKAGE_iptables-mod-tproxy=y
