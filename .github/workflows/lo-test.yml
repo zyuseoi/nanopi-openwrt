@@ -89,6 +89,12 @@ jobs:
           find package/ -type d -name luci-app-* | rev | cut -d'/' -f1 | rev | xargs -ri echo CONFIG_PACKAGE_{}=m >> .config
           cat $GITHUB_WORKSPACE/extra_packages.seed >> .config
           cat more_luci.txt >> .config
+          echo "CONFIG_PACKAGE_frpc=y" >> .config
+          echo "CONFIG_PACKAGE_frps=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-frpc=y" >> .config
+          echo "CONFIG_PACKAGE_luci-app-frps=y" >> .config
+          echo "CONFIG_PACKAGE_luci-i18n-frpc-zh-cn=y" >> .config
+          echo "CONFIG_PACKAGE_luci-i18n-frps-zh-cn=y" >> .config
           [ -f .config_fix ] && cat .config_fix >> .config
           make defconfig && sed -i -E 's/# (CONFIG_.*_COMPRESS_UPX) is not set/\1=y/' .config && make defconfig
           cat .config
@@ -243,6 +249,9 @@ jobs:
           ls packages/*.ipk | xargs -n1 basename > package.files
           PACKAGES=$(cat $GITHUB_WORKSPACE/$DEVICE.config.seed $GITHUB_WORKSPACE/common.seed | grep CONFIG_PACKAGE | grep '=y' | grep -v CONFIG_PACKAGE_luci-app | sed 's/CONFIG_PACKAGE_//;s/=y//' | xargs -ri grep -o {} package.files | sort -u | xargs echo)
           PACKAGES="$PACKAGES `grep -o luci-i18n-opkg-zh-cn package.files || true`"
+          PACKAGES="$PACKAGES frpc frps luci-app-frpc luci-app-frps luci-i18n-frpc-zh-cn luci-i18n-frps-zh-cn"
+          LUCI=$(cat $GITHUB_WORKSPACE/$DEVICE.config.seed $GITHUB_WORKSPACE/common.seed | grep CONFIG_PACKAGE_luci-app | grep '=y' | grep -v docker | sed 's/CONFIG_PACKAGE_//;s/=y//' | xargs -ri grep -o {} package.files | sort -u | xargs echo)
+          LP=$(echo $LUCI | sed 's/-app-/-i18n-/g;s/ /\n/g' | xargs -ri grep -o {}-zh-cn package.files | xargs echo)
           make image PACKAGES="$PACKAGES $LUCI $LP luci-i18n-base-zh-cn luci-i18n-firewall-zh-cn" FILES="files"
 
           mkdir -p $GITHUB_WORKSPACE/release
